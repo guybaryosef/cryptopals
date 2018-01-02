@@ -2,36 +2,29 @@
  Cryptopals Crypto Challenges
  Set 1
  Challenge 1 - Convert hex to base64
- Version 1.1
+ Version 1.2
 
  By: Guy Bar Yosef
  */
 
+
 #include <string>
 #include <cmath>
 #include <iostream>
+#include <iomanip>
 
 using namespace std;
 
-string hex2bin (string hex);     // converts hexadecimal values to binary
-string bin2base64 (string bin);  // converts binary to base64
+string bintobase64 (string bin);  // converts binary to base64
+string hextobin (string hex);     // converts hexadecimal values to binary
+string bintohex (string bin);     // converts binary to hexadecimal
 
-int main () {
 
-    string hex;             // inputted hex value
-    cin >> hex;
-
-    string bin = hex2bin(hex);          //intermediate binary value
-    string base64 = bin2base64(bin);    //output base64 value
-
-    cout << base64 << endl;
-    return 0;
-}
 
 /*
  * converts binary digit to base64
  */
-string bin2base64(string bin) {
+string bintobase64(string bin) {
 
     string base64 = "";     //final base64 value
     int binlen = bin.length();
@@ -60,12 +53,12 @@ string bin2base64(string bin) {
 /*
  * converts hexadecimal digit to binary
  */
-string hex2bin (string hex) {
+string hextobin (string hex) {
 
     string bin = "";            //final binary value
     int hexlen = hex.length();
 
-    for (int i = 0 ; i < hexlen ; i++)     //converting hex to binary through 
+    for (int i = 0 ; i < hexlen ; i++)     //converting hex to binary through
         switch(hex[i]) {
             case '0': bin.append("0000"); break;
             case '1': bin.append("0001"); break;
@@ -86,3 +79,36 @@ string hex2bin (string hex) {
             }
     return bin;
 }
+
+/*
+ *  converts binary to hexadecimal
+ */
+
+ string bintohex (string bin) {
+
+    string hexaoutput = "";                     // the returneed hexadecimal value of the inputted binary
+    string ENCODING16 = "0123456789abcdef";     // hexadecimal encoding scheme
+    int len = bin.length();
+
+    for (int i = len -1 ; i >= 0 ; i -= 4 ) {      //iterates all bits backwards,
+        string current;
+
+        if (i < 3) {
+            string zerobuf = "0";
+            int j = 3 - i;
+            while (j-- > 1)
+                zerobuf.append("0");
+            current = zerobuf + bin.substr(0, 4 - zerobuf.length() );
+        }
+        else
+            current = bin.substr(i-3, 4);
+
+        int value = 0;
+        for (int j = 3, k = 0 ; j >= 0 ; j--, k++)
+            value += (current[j] == '0') ? 0 : pow(2, k);
+
+        hexaoutput = ENCODING16[value] + hexaoutput;
+    }
+
+    return hexaoutput;
+ }
