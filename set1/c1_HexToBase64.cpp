@@ -2,63 +2,55 @@
  Cryptopals Crypto Challenges
  Set 1
  Challenge 1 - Convert hex to base64
- Version 1.2
+ Version 1.3
 
  By: Guy Bar Yosef
  */
-
 
 #include <string>
 #include <cmath>
 #include <iostream>
 #include <iomanip>
+#include <sstream>
 
 using namespace std;
 
 string bintobase64 (string bin);  // converts binary to base64
-string hextobin (string hex);     // converts hexadecimal values to binary
+string hextobin (string hex);     // converts hexadecimal to binary
 string bintohex (string bin);     // converts binary to hexadecimal
 
 
-
 /*
- * converts binary digit to base64
+ * converts binary string object to a base64 string object
  */
 string bintobase64(string bin) {
 
-    string base64 = "";     //final base64 value
-    int binlen = bin.length();
     string ENCODING64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"; // base64 encoding scheme
 
-    for (int i = binlen - 1 ; i >= 0 ; i -= 6) {    //iterate through binary digit, at 6-bit value intervals, right to left
-        string current;                             // the 6-bit value in decimal
-        if (i < 5) {                                // dealing w/ final iteration, final base64 value could be < 6 bits
-            int bufzeroscount = 5 - i;              // amount of 0s to add to make 'current' a 6-bit value
-            string bufzero = "0";
-            for (int j = bufzeroscount ; j > 1 ; j--)
-                bufzero.append("0");
-            current = bufzero + bin.substr(0, i + 1); // the final 6-bit digit, w/ zero buffer
-        }
-        else                                        // all other iteration except maybe final iteration
-            current = bin.substr(i - 5, 6);
+    int len = bin.length();
+    int binmod = len % 6;
+    bin = (binmod == 0 ) ? bin : ( string(6 - binmod, '0') + bin ) ;
 
-        int value = 0;
-        for (int j = 5, k = 0 ; j >= 0  ; j--, k++) // finding decimal 'value' of current,--> will become index of base64 encoding scheme
-            value += (current[j] == '0') ? 0 : pow(2, k);
-        base64 = ENCODING64[value] + base64;
+    string base64 = "";     //final base64 value
+    for (int i = 0 ; i < len ; i += 6) {       //iterate through binary digit, at 6-bit value intervals, right to left
+        int decvalue = 0;
+        for (int j = 5, k = 0 ; j >= 0  ; j--, k++)    // finding decimal 'value' of current,--> will become index of base64 encoding scheme
+            decvalue += (bin[i + j] == '0') ? 0 : pow(2, k);
+
+        base64.push_back( ENCODING64[decvalue] );
     }
     return base64;
 }
 
 /*
- * converts hexadecimal digit to binary
+ * converts hexadecimal string object to a binary string object
  */
 string hextobin (string hex) {
 
     string bin = "";            //final binary value
     int hexlen = hex.length();
 
-    for (int i = 0 ; i < hexlen ; i++)     //converting hex to binary through
+    for (int i = 0 ; i < hexlen ; i++)     //converting hex to binary through switch function
         switch(hex[i]) {
             case '0': bin.append("0000"); break;
             case '1': bin.append("0001"); break;
@@ -81,34 +73,18 @@ string hextobin (string hex) {
 }
 
 /*
- *  converts binary to hexadecimal
+ *  converts a binary string object to a hexadecimal string object
  */
-
  string bintohex (string bin) {
 
-    string hexaoutput = "";                     // the returneed hexadecimal value of the inputted binary
-    string ENCODING16 = "0123456789abcdef";     // hexadecimal encoding scheme
-    int len = bin.length();
+    int binmod = bin.length() % 4;
+    bin = (binmod == 0) ? bin : ( string( 4 - (binmod), '0' ) + bin );   //adds necessary amount of '0's to beginning to make last hexadecimal digit 4 bits
 
-    for (int i = len -1 ; i >= 0 ; i -= 4 ) {      //iterates all bits backwards,
-        string current;
+    long long decvalue = 0;            // long long as to let input binary value be large
+    for (int i = bin.length() - 1, k = 0 ; i >= 0 ; i--, k++ )  //iterate right to left, raising each bit by 2^(its posisition); i.e. binary -> decimal
+        decvalue += (bin[i] == '0') ? 0 : pow(2, k);
 
-        if (i < 3) {
-            string zerobuf = "0";
-            int j = 3 - i;
-            while (j-- > 1)
-                zerobuf.append("0");
-            current = zerobuf + bin.substr(0, 4 - zerobuf.length() );
-        }
-        else
-            current = bin.substr(i-3, 4);
-
-        int value = 0;
-        for (int j = 3, k = 0 ; j >= 0 ; j--, k++)
-            value += (current[j] == '0') ? 0 : pow(2, k);
-
-        hexaoutput = ENCODING16[value] + hexaoutput;
-    }
-
-    return hexaoutput;
+    stringstream ss;
+    ss << hex << decvalue;  // converts decimal to hexadecimal through stream
+    return ss.str();        // returns a copy of stream ss as a string
  }
