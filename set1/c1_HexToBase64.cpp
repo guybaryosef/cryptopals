@@ -77,14 +77,19 @@ string hextobin (string hex) {
  */
  string bintohex (string bin) {
 
-    int binmod = bin.length() % 4;
+    string ENCODING16 = "0123456789abcdef";         // hexadecimal encoding
+
+    int len = bin.length();
+    int binmod = len % 4;                           // number of necessary 0s to buffer leftmost hex value
     bin = (binmod == 0) ? bin : ( string( 4 - (binmod), '0' ) + bin );   //adds necessary amount of '0's to beginning to make last hexadecimal digit 4 bits
 
-    long long decvalue = 0;            // long long as to let input binary value be large
-    for (int i = bin.length() - 1, k = 0 ; i >= 0 ; i--, k++ )  //iterate right to left, raising each bit by 2^(its posisition); i.e. binary -> decimal
-        decvalue += (bin[i] == '0') ? 0 : pow(2, k);
+    string base16 = "";
+    for (int i = 0 ; i < len ; i += 4) {                 // iterate through every hex value, left to right
+        int decvalue = 0;
+        for (int j = 3, k = 0 ; j >= 0  ; j--, k++)      // finding decimal value of current hex digit
+            decvalue += (bin[i + j] == '0') ? 0 : pow(2, k);
 
-    stringstream ss;
-    ss << hex << decvalue;  // converts decimal to hexadecimal through stream
-    return ss.str();        // returns a copy of stream ss as a string
+        base16.push_back( ENCODING16[decvalue] );
+    }
+    return base16;
  }
