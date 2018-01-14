@@ -9,18 +9,7 @@
 
 #include "c1_HextoBase64.cpp"
 
-string twoBinXor(string hex1, string hex2);
-
-int main() {
-
-    string hex1, hex2;
-    cin >> hex1 >> hex2;
-
-    cout << twoBinXor(hex1, hex2) << endl;
-
-    return 0;
-
-}
+string twoBinXor(string hex1, string hex2);  //XORs two hexadecimal strings
 
 
 /*
