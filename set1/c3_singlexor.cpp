@@ -2,7 +2,9 @@
  Cryptopals Crypto Challenges
  Set 1
  Challenge 3 - Single-byte XOR cipher
- Version 1.0
+ Version 1.1
+
+ Comment: Will require c++11 or higher because of stoi function
 
  By: Guy Bar Yosef
  */
@@ -14,7 +16,15 @@
 
 #include "c2_fixedXOR_1_0.cpp"         // for twoBinXor function
 
-string singleXor(string bininput);     // takes a binary input and returns the encrypted string
+// each decrypted message has a number ('score') associated with it, representing how likely it is to be english
+typedef struct message_score {
+    double score = 0;   // english score associated with decrypted message
+    char key;           // character message was XORed against
+    string message;     // decrypted message
+    string hexencoded;  // the hex-encoded string that results from the XORing of the key and message
+} message_score;
+
+message_score singleXor(string bininput);     // takes a binary input and returns the encrypted string
 double englishScore(string input);     // scores text, higher score relates to higher chance to be english
 string bintoString(string hex1);       // converts hexadecimal to string
 
@@ -23,20 +33,20 @@ int main () {
     string hexinput;                        // hexadecimal input
     cin >> hexinput;
     string bininput = hextobin(hexinput);   // binary value of input
-    cout << "Message: " << singleXor(bininput) << endl;
+    message_score decrypted = singleXor(bininput);
+    cout << "The message is: " << decrypted.message << endl;
     return 0;
 }
-/*
+*/
 
 
 /*
  * Takes binary input and returns a string that was encrypted through an XOR with a single ascii char
  * Main idea here is that: [ message XOR key XOR key = message ], and our input was [message XOR key], the encrypted message
  */
- string singleXor(string bininput) {
-
-     string correctmessage;        // the decrypted message
-     double maxscore = 0;          // the maxscore to keep track of through iterations below
+ message_score singleXor(string bininput) {
+     message_score output;      //output message and its associated english score
+     output.hexencoded = bintohex(bininput);
 
      //iterate through all ascii values, finding the one which produces the heighest english score, signifying how close the potential message is in english
      for (unsigned char c = 0 ; c < 128 ; c++) {
@@ -53,12 +63,13 @@ int main () {
          string message = bintoString( twoBinXor(possiblekey, bininput) );
          double score = englishScore(message);
 
-         if (score > maxscore) {  // if we have a new high-english-score message, make that the most likely candidate
-             maxscore = score;
-             correctmessage = message;
+         if (score > output.score) {  // if we have a new high-scored message, make that the new decrypted message
+             output.score = score;
+             output.message = message;
+             output.key = c;
          }
      }
-     return correctmessage;
+     return output;
  }
 
 /*
