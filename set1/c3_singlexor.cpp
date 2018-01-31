@@ -14,7 +14,7 @@
 #include <bitset>                      // for converting char to string of binary
 #include <cassert>                      // for the assert function
 
-#include "c2_fixedXOR_1_0.cpp"         // for twoBinXor function
+#include "c2_fixedXOR.cpp"         // for twoBinXor function
 
 // each decrypted message has a number ('score') associated with it, representing how likely it is to be english
 typedef struct message_score {
@@ -108,9 +108,8 @@ string bintoString(string bin) {
     int len = bin.length();     //length of binary string
     bin = (len % 8 == 0 ) ? bin : ( string(8 - (len % 8) , '0' ) + bin);    // add correct amount of 0s to make leftmost byte 8 bits
 
-    string output = "";
+    string output;
     for (int i = 0 ;  i < len ; i += 8)                                     // iterates through binary input, byte by byte
         output.push_back( (char) stoi( bin.substr(i, 8) , nullptr , 2 ) );  // converts each byte to equivalent ascii char; requires c++11
-
     return output;
 }
