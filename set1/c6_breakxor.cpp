@@ -125,13 +125,10 @@ void breakXor(string input) {
             key = possibleKey;
         }
     }
-    input_file.close();
-
     // The writing of the correct key and message to output file 'c6_output.txt'.
     ofstream output_file("c6_output.txt");
     output_file << "Key: " << key << '\n' << "Message: " << endl;
     output_file << message << endl;
-    output_file.close();
 }
 
 
