@@ -2,7 +2,9 @@
  Cryptopals Crypto Challenges
  Set 1
  Challenge 1 - Convert hex to base64
- Version 1.4
+ Version 1.6
+
+ Comment: Will require c++11 or higher
 
  By: Guy Bar Yosef
  */
@@ -12,12 +14,16 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+#include <bitset>
 
 using namespace std;
 
-string bintobase64 (string bin);  // converts binary to base64
-string hextobin (string hex);     // converts hexadecimal to binary
-string bintohex (string bin);     // converts binary to hexadecimal
+string bintobase64 (string bin);   // converts binary to base64
+string hextobin (string hex);      // converts hexadecimal to binary
+string bintohex (string bin);      // converts binary to hexadecimal
+string base64tobin(string base64); // decodes base64 to binary
+string bintoString(string hex1);   // converts hexadecimal to string
+string stringtobin(string input);  // converts string to binary
 
 /*
 int main() {
@@ -105,4 +111,55 @@ string hextobin (string hex) {
         base16.push_back( ENCODING16[decvalue] );
     }
     return base16;
+ }
+
+ /*
+  Converts a string in base64 to binary with the encoding scheme defined in challenge 1.
+     - Note: This function assums that the base64 input is correct, as in an actual character length encoded to base64. In other words this function assumes that: [ base64.length() % 4 = 0].
+  */
+ string base64tobin(string input) {
+     string output;
+     for (int i = 0 ; i < input.length() ; i++) {
+         int cur;
+         if (input[i] >= 'a' && input[i] <= 'z')
+             cur = input[i] - 'a' + 26;
+         else if (input[i] >= 'A' && input[i] <= 'Z')
+             cur = input[i] - 'A';
+         else if (input[i] >= '0' && input[i] <= '9')
+             cur = input[i] - '0' + 52;
+         else if (input[i] == '+')
+             cur = 62;
+         else if (input[i] == '/')
+             cur = 63;
+         else        // as this function assumes a correct input, this will only occur if the current char is '='.
+             cur = 0;
+         bitset <6> temp (cur);
+         output.append( temp.to_string() );
+     }
+     return output;
+ }
+
+ /*
+  *  converts binary digit string to ascii equivalent
+  */
+ string bintoString(string bin) {
+     int len = bin.length();     //length of binary string
+     bin = (len % 8 == 0 ) ? bin : ( string(8 - (len % 8) , '0' ) + bin);    // add correct amount of 0s to make leftmost byte 8 bits
+
+     string output;
+     for (int i = 0 ;  i < len ; i += 8)    // iterates through binary input, byte by byte
+         output.push_back( (char) stoi( bin.substr(i, 8) , nullptr , 2 ) );  // converts each byte to equivalent ascii char; requires c++11
+     return output;
+ }
+
+/*
+ * takes in a string of ascii characters and converts it into binary
+ */
+ string stringtobin(string input) {
+     string output;
+     for (int i = 0 ; i < input.length() ; i++) {
+         bitset <8> temp (input[i]);
+         output.append(temp.to_string() );
+     }
+     return output;
  }
