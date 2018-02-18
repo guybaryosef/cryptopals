@@ -1,2 +1,2 @@
 # cryptopals
-problem sets from cryptopals
+crypto challenges from cryptopals
