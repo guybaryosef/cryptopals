@@ -4,7 +4,10 @@
  Challenge 9 - Implement PKCS#7 padding
  Version 1.0
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> b02ba5178791491e6c13b3281e9fc36552601bbd
  By: Guy Bar Yosef
  */
 
@@ -38,4 +41,8 @@ void implementPKSC7( string & input, int blocksize ) {
     int padding_size = input.length() % blocksize;
     string to_append = std::string((char)padding_size , padding_size);
     input = input + to_append;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> b02ba5178791491e6c13b3281e9fc36552601bbd
