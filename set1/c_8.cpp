@@ -6,8 +6,6 @@
  By: Guy Bar Yosef
  */
 
-#include <iostream>
-
 #include "functions.cpp"
 #include "baseClasses.hpp"
 

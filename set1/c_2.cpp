@@ -6,14 +6,8 @@
  By: Guy Bar Yosef
  */
 
-#include <iostream>
-#include <string>
-#include <cmath>
-
 #include "functions.cpp"
 #include "baseClasses.hpp"
-
-using namespace std;
 
 int main() {
     string input1 = "1c0111001f010100061a024b53535009181c";

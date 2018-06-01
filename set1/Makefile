@@ -26,4 +26,4 @@ chal8:
 	$(CXX) $(CXXFLAGS) baseClasses.cpp c_8.cpp 
 
 clean:
-	rm *.o
+	rm *.out
