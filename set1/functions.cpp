@@ -15,7 +15,7 @@
 #include <bitset>
 #include <cassert>
 #include <vector>
-#include <openssl/evp.h>
+#include <openssl/aes.h>
 
 #include "baseClasses.hpp"
 
@@ -53,8 +53,7 @@ string repeatingxor(string inputfile, string key);   //encrypts a string using r
 double editDistance(string one, string two); // finds the number of differing bits between two strings
 void breakXor(string input_file);            // function to break the Vigenere Cypher
 
-void decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key, unsigned char *plaintext);  //decrypts a string in AES 128 in ECB mode
-void decryptAES128inECB(string inputfile, string inputkey);         //Overall function that prepares the input for and then runs the funtion 'decrypt'.
+void decryptAES128inECB(unsigned char *input, unsigned char inputkey[], unsigned char *output, int length);  //Overall function decrypts an AES in CBC mode encrypted string.
 
 string detectAESinECB(string file);    //detects the AES in ECB mode encryption of a file.
 
@@ -307,65 +306,16 @@ double editDistance(string bin1, string bin2) {
 
 
 /*
-  Takes as input a base64- encoded file that has been encrypted via AES-128 in ECB mode under the specified key.
-  Outputs the decrypted message to c7_output.txt
+  Takes as input a pointer to an input, encryption/decryption key (AES is symmetric so they are the same),
+  and the length of the input (which should equal at least the length of the output).
+  This function decrypts the input and stores it in 'output'.
  */
-void decryptAES128inECB(string inputfile, string inputkey) {
-    ifstream input_file(inputfile);
-    assert (input_file && "Couldn't open file :(");
-
-    Bin bininput;
-    string temp;
-    Base64 buf1;
-    while (getline(input_file, buf1.val))
-        bininput.val.append( buf1.toBin() );
+void decryptAES128inECB(unsigned char *input, unsigned char inputkey[], unsigned char *output, int length) {
+    AES_KEY key;
+    AES_set_decrypt_key(inputkey, 128,&key);
     
-    string input = bininput.toString();
-
-    // the following are types as specified by the decrypt function below
-    unsigned char *key = (unsigned char *) inputkey.c_str();       // AES cipher key
-    unsigned char decryptedtext[input.length()];                   // Buffer for the decrypted text
-    unsigned char *ciphertext = (unsigned char *)input.c_str();    // the encrypted test, in ascii
-
-    decrypt(ciphertext, input.length(), key, decryptedtext);
-
-    string output(reinterpret_cast<char*> (decryptedtext));
-
-    // checks for padding and removes it if found.
-    for (int i = 15 ; i > 0 ; i--)
-        if ( (unsigned char)(output[output.length() - i]) == 4 ||   // the 4 ascii char is the End-Of-Transimission char
-             (unsigned char)(output[output.length() - i]) > 126)    // after 126 ascii becomes non- english chars
-            output.erase(output.length() - i + 1);
-
-    ofstream output_file("c_7output.txt");
-    output_file << output << endl;
-}
-
-
-/*
-  Very heavily derived from the OpenSSLWiki  page: https://wiki.openssl.org/index.php/EVP_Symmetric_Encryption_and_Decryption
- */
-void decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key, unsigned char *plaintext)
-{
-    /* Create and initialise the context */
-    EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
-
-    // Initialise the decryption operation.
-    EVP_DecryptInit_ex(ctx, EVP_aes_128_ecb(), NULL, key, NULL);
-
-    // Provide the message to be decrypted, and obtain the plaintext output.
-    // EVP_DecryptUpdate can be called multiple times if necessary.
-    int len;
-    EVP_DecryptUpdate(ctx, plaintext, &len, ciphertext, ciphertext_len);
-    int plaintext_len = len;
-
-    //Finalise the decryption. Further plaintext bytes may be written at this stage.
-    EVP_DecryptFinal_ex(ctx, plaintext + len, &len);
-    plaintext_len += len;
-
-    /* Clean up */
-    EVP_CIPHER_CTX_free(ctx);
-    return;
+    for (int i = 0 ; i < length ; i += AES_BLOCK_SIZE )
+        AES_decrypt(input + i, output + i, &key);
 }
 
 

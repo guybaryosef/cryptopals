@@ -2,8 +2,10 @@ CXX = clang++
 CXXFLAGS = -std=c++11 -lcrypto 
 
 chal9:
-	$(CXX) $(CXXFLAGS) c_9.cpp 
+	$(CXX) $(CXXFLAGS) ../set1/baseClasses.cpp c_9.cpp 
 
+chal10:
+	$(CXX) $(CXXFLAGS) ../set1/baseClasses.cpp c_10.cpp 
 
 clean:
-	rm *.out
+	rm *.out *output.txt
