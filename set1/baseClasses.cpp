@@ -23,13 +23,18 @@ using namespace std;
 */
 
 // constructor
-Bin::Bin(string input) { val = input; }
+Bin::Bin(string input, string type) {
+    if (type == "bin")
+        val = input;
+    else
+        val = fromString(input); 
+    }
 
 // takes in a string of ascii characters and converts it into binary
-string Bin::fromString() {
+string Bin::fromString(string input) {
     string output;
-    for (int i = 0 ; i < val.length() ; i++) {
-        bitset <8> temp (val[i]);
+    for (int i = 0 ; i < input.length() ; i++) {
+        bitset <8> temp (input[i]);
         output.append(temp.to_string() );
     }
     return output;

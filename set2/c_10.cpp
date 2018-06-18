@@ -24,11 +24,14 @@ int main() {
     
     string temp = bininput.toString();
 
-    unsigned char input[temp.length()]; // containes the encrypted string from the input file
+    unsigned char input[temp.length()+1]; // containes the encrypted string from the input file
     for (int i = 0 ; i < temp.length() ; ++i)
         input[i] = temp[i];
+    input[temp.length()] = '\0';
 
-    unsigned char output[temp.length()];    // will contain the decyphered text
+    unsigned char output[temp.length()+1];    // will contain the decyphered text
+    output[temp.length()] = '\0';
+    
     decryptAES128inCBC(IV, input, inputKey, output, temp.length() );
 
     ofstream output_file("c_10output.txt");
@@ -37,9 +40,11 @@ int main() {
     input_file.close();
     output_file.close();
     
+    ////////////////////////////////////////
     // encrypting and decrypting my own file, 'c_10input2.txt', and outputing the result as 'c_10output2.txt'.
-    inputf = "c_10input2.txt";
-    input_file.open(inputf);
+    ////////////////////////////////////////
+    
+    input_file.open("c_10input2.txt");
     assert(input_file && "unable to open file :{");
 
     output_file.open("c_10output2.txt");
@@ -48,29 +53,30 @@ int main() {
     string buffer;
     string totalinput;
     while (getline(input_file, buffer))
-        totalinput.append( buffer );
+        totalinput.append( buffer+ "\n");
+
+    output_file << "Original Message: " << endl << totalinput << endl;
 
     totalinput = implementPKSC7(totalinput, AES_BLOCK_SIZE); // pad the plaintext
 
-    unsigned char input2[totalinput.length()];   // the input of the plaintext file
+    unsigned char input2[totalinput.length()+1];   // the input of the plaintext file
     for (int i = 0 ; i < totalinput.length() ; ++i)
         input2[i] = totalinput[i];
+    input2[totalinput.length()] = '\0';
 
-    
-    unsigned char encryptedText[totalinput.length()];    // the outputted encrypted text
+    unsigned char encryptedText[totalinput.length() +1];    // the outputted encrypted text
+    encryptedText[totalinput.length()] = '\0';
+
     encryptAES128inCBC(IV, input2, inputKey, encryptedText, totalinput.length());
 
-    string temp2 = (char *)encryptedText;
-    // encode encrypted message into base64
-    Bin temp3(temp2);
-    temp3.val = temp3.fromString();
+    output_file << "\n\n" << "Encrypted Message: " << endl << encryptedText << endl;
 
-    output_file << "Encrypted message: " << endl << temp3.toBase64() << endl;
+    unsigned char decryptedText[totalinput.length()+1];
+    decryptedText[totalinput.length()] = '\0';
 
-    unsigned char decryptedText[totalinput.length()];
     decryptAES128inCBC(IV, encryptedText, inputKey, decryptedText, totalinput.length() );
 
-    output_file << "Decrypted message: " << endl << decryptedText << endl;
+    output_file << "\n\n" << "Decrypted message: " << endl << decryptedText << endl;
 
     return 0;
 }

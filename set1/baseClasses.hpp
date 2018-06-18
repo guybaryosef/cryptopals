@@ -13,9 +13,9 @@
 
 struct Bin {
     std::string val;
-    Bin(std::string = std::string());
+    Bin(std::string = std::string(), std::string = "bin");
 
-    std::string fromString();
+    std::string fromString(std::string);
     std::string toString();
     std::string toHex();
     std::string toBase64();

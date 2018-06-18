@@ -7,5 +7,8 @@ chal9:
 chal10:
 	$(CXX) $(CXXFLAGS) ../set1/baseClasses.cpp c_10.cpp 
 
+chal11:
+	$(CXX) $(CXXFLAGS) ../set1/baseClasses.cpp c_11.cpp 
+
 clean:
-	rm *.out *output.txt
+	rm *.out *output*.txt

@@ -50,12 +50,13 @@ message_score detectxor(string filename);    // finds the single-xor encrypted m
 
 string repeatingxor(string inputfile, string key);   //encrypts a string using repeated-key XOR with key
 
-double editDistance(string one, string two); // finds the number of differing bits between two strings
+double editDistance(string one, string two); // finds the number of differing bits between two binary strings
 void breakXor(string input_file);            // function to break the Vigenere Cypher
 
-void decryptAES128inECB(unsigned char *input, unsigned char inputkey[], unsigned char *output, int length);  //Overall function decrypts an AES in CBC mode encrypted string.
-
-string detectAESinECB(string file);    //detects the AES in ECB mode encryption of a file.
+// 128 bit AES in ECB mode
+void decryptAES128inECB(unsigned char *input, unsigned char inputkey[], unsigned char *output, int length);  
+void encryptAES128inECB(unsigned char *input, unsigned char inputkey[], unsigned char *output, int length);  
+string detectAESinECB(string file);    //detects the 128bit AES in ECB mode encryption of a file.
 
 /*
  *  takes two strings of binary numbers and outputs their XOR combination as a string
@@ -292,7 +293,7 @@ void breakXor(string input) {
 
 
 /*
-  This funciton computes the Hamming Distance between two strings.
+  This funciton computes the Hamming Distance between two binary strings.
   Input is the two strings to compare and the output is the number of differing bits between the two.
     - Note: This function assumes correct input, meaning that it does not check that the two inputed binary strings are equal length.
  */
@@ -312,18 +313,29 @@ double editDistance(string bin1, string bin2) {
  */
 void decryptAES128inECB(unsigned char *input, unsigned char inputkey[], unsigned char *output, int length) {
     AES_KEY key;
-    AES_set_decrypt_key(inputkey, 128,&key);
+    AES_set_decrypt_key(inputkey, 128, &key);
     
     for (int i = 0 ; i < length ; i += AES_BLOCK_SIZE )
         AES_decrypt(input + i, output + i, &key);
+}
+
+/*
+  Idential to the above, but encryptes AES in ECB mode
+*/
+void encryptAES128inECB(unsigned char *input, unsigned char inputkey[], unsigned char *output, int length) {
+    AES_KEY key;
+    AES_set_encrypt_key(inputkey, 128, &key);
+
+    for (int i = 0 ; i < length ; i += AES_BLOCK_SIZE )
+        AES_encrypt(input + i, output + i, &key);
 }
 
 
 /*
   This Function takes as input a name of a file full of hex-encoded cyphertexts and outputs 
   the one that was encrypted using AES in ECB mode.
-  Because AES in ECB mode is statless and deterministic over a 16-byte key, to detect a text
-  encrypted with it we could use the Hamming Distance between repeating 16-byte iterations.
+  Because AES in ECB mode is stateless and deterministic over a 16-byte key, to detect a text
+  encrypted with it we could use the edit distance between repeating 16-byte iterations.
  */
 string detectAESinECB(string file) {
     ifstream input_file;
@@ -340,12 +352,11 @@ string detectAESinECB(string file) {
         for (int i = 0 ; i < 3 ; i++) {
             distance += editDistance( bin_try.substr(i*8*16, 16*8), bin_try.substr( (i+1)*8*16, 8*16) );
         }
-        if (distance  < min_distance) {
+        if (distance < min_distance) {
             min_distance = distance;
             likely_string = temp.val; 
         }
     }
     return likely_string;
 }
-
 #endif
